@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using ToDoMinimalAPI.ToDos;
 using ToDos.MinimalAPI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,10 +22,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/todo", (IToDoService service) => service.GetAll());
-app.MapGet("/todo/{id}", ([FromServices]IToDoService service,[FromRoute] Guid id) => service.GedById(id));
-app.MapPost("/todo", (IToDoService service, [FromBody]ToDo toDo) => service.Create(toDo));
-app.MapPut("/todo", (IToDoService service, Guid id, ToDo toDo) => service.Update(toDo));
-app.MapDelete("/todo/{id}", (IToDoService service, Guid id) => service.Delete(id));
+//ToDoRequests.RegisterEndpoints(app);
+app.RegisterEndpoints();
+
 app.Run();
 
