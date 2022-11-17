@@ -1,7 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using ToDoMinimalAPI.ToDos;
-using ToDos.MinimalAPI;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Extensions.DependencyInjection;
+global using ToDoMinimalAPI.ToDos;
+global using ToDos.MinimalAPI;
+global using FluentValidation;
+global using ToDosMinimalAPI.ToDos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IToDoService, ToDoService>();
+builder.Services.AddValidatorsFromAssemblyContaining(typeof(ToDoValidator));
 
 var app = builder.Build();
 

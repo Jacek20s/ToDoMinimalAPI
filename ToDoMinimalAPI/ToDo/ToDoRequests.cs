@@ -1,4 +1,7 @@
 ﻿
+using FluentValidation;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 using ToDos.MinimalAPI;
 
 namespace ToDoMinimalAPI.ToDos
@@ -22,7 +25,7 @@ namespace ToDoMinimalAPI.ToDos
             app.MapPut("/todo", ToDoRequests.Update /*(IToDoService service, Guid id, ToDo toDo) => service.Update(toDo)*/)
                 .Produces(StatusCodes.Status204NoContent)
                 .Produces(StatusCodes.Status404NotFound)
-                .Accepts<ToDo>("application/json");
+                .Accepts<ToDo>("application/json"); 
 
             app.MapDelete("/todo/{id}", ToDoRequests.Delete/*(IToDoService service, Guid id) => service.Delete(id)*/)
                 .Produces(StatusCodes.Status204NoContent)
@@ -47,21 +50,32 @@ namespace ToDoMinimalAPI.ToDos
             return Results.Ok(todo);
         }
 
-        public static IResult Create(IToDoService service, ToDo toDo)
+        public static IResult Create(IToDoService service, ToDo toDo, IValidator<ToDo> validator)
         {
+            var validationResult = validator.Validate(toDo);
+            if (!validationResult.IsValid)
+            {
+                return Results.BadRequest(validationResult.Errors);
+            }
+
             service.Create(toDo);
             return Results.Created($"/todo/{toDo.Id}", toDo);
         }
 
-        public static IResult Update(IToDoService service, Guid id, ToDo toDo)
+        public static IResult Update(IToDoService service, Guid id, ToDo toDo, IValidator<ToDo> validator)
         {
-            var todo = service.GedById(id);
-            if (todo == null)
+            var validationResult = validator.Validate(toDo);
+            if (!validationResult.IsValid)
+            {
+                return Results.BadRequest(validationResult.Errors);
+            }
+            
+            if (toDo == null)
             {
                 return Results.NotFound();
             }
-            service.Update(todo);
-            return Results.Ok();
+            service.Update(toDo);
+            return Results.Ok(toDo);
         }
 
         public static IResult Delete(IToDoService service, Guid id)
